@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
 )
 
@@ -16,8 +17,10 @@ func main() {
 	fmt.Printf("[%s]: %s\n", appName, message)
 
 	// Set up a simple HTTP server
-	http.HandleFunc("/hello", helloHandler)
-	http.HandleFunc("/bye", byeHandler)
+	r := mux.NewRouter()
+	r.HandleFunc("/hello", helloHandler).Methods("GET")
+	r.HandleFunc("/bye", byeHandler).Methods("GET")
+	http.Handle("/", r)
 	http.ListenAndServe(":8080", nil)
 }
 
