@@ -2,44 +2,48 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
-
-	"github.com/gorilla/mux"
-	"github.com/spf13/viper"
+	"os"
 )
 
-func main() {
-	// Initialize Viper to read configuration
-	initConfig()
-	appName := viper.GetString("app_name")
-	message := viper.GetString("welcome_message")
-	fmt.Printf("[%s]: %s\n", appName, message)
+/*
+Creating API end point to recive messages
+	Lets Download All the go docs
 
-	// Set up a simple HTTP server
-	r := mux.NewRouter()
-	r.HandleFunc("/hello", helloHandler).Methods("GET")
-	r.HandleFunc("/bye", byeHandler).Methods("GET")
-	http.Handle("/", r)
-	http.ListenAndServe(":8080", nil)
-}
+*/
 
-func helloHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Hello, world!")
-}
-
-func byeHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "bye World!")
-}
-
-func initConfig() {
-	viper.SetConfigName("config") // name of config file
-	viper.SetConfigType("yaml")   // REQUIRED
-	viper.AddConfigPath(".")      // optionally loook for config in working dir
-
-	err := viper.ReadInConfig() // find and read the config file
-	if err != nil {
-		log.Fatal("Error reading config file", err)
+func check(e error) {
+	if e != nil {
+		log.Fatal(e)
 	}
+}
+
+func main() {
+	// link- https://go.dev/doc/tutorial/create-module
+	url := "https://go.dev/doc/tutorial/create-module"
+	resp, err := http.Get(url)
+	check(err)
+	defer resp.Body.Close()
+
+	// Check http response code
+	if resp.StatusCode != http.StatusOK {
+		log.Fatalf("HTTP request failed with status code %d:", resp.StatusCode)
+	}
+
+	// read the parsed body
+	bytes, err := io.ReadAll(resp.Body)
+	check(err)
+
+	// Write the decoded bytes to new file
+	file, err := os.Create("go-doc.html")
+	check(err)
+	defer file.Close()
+
+	// write parsed data to file
+	_, err = file.Write(bytes)
+	check(err)
+	fmt.Println("writing ...")
 
 }
