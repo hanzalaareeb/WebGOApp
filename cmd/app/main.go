@@ -8,12 +8,6 @@ import (
 	"os"
 )
 
-/*
-Creating API end point to recive messages
-	Lets Download All the go docs
-
-*/
-
 func check(e error) {
 	if e != nil {
 		log.Fatal(e)
@@ -45,5 +39,9 @@ func main() {
 	_, err = file.Write(bytes)
 	check(err)
 	fmt.Println("writing ...")
+
+	/*
+
+	 */
 
 }
